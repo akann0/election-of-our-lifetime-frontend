@@ -12,9 +12,11 @@ class ElectionService {
 
   async initializeGradioClient() {
     try {
-      this.client = new Client.connect("akann0/basic-word-vectorization");
+      this.client = await Client.connect("akann0/basic-word-vectorization");
+      console.log("Gradio client initialized successfully");
     } catch (error) {
       console.error('Error initializing Gradio client:', error);
+      this.client = null; // Ensure client is null if initialization fails
     }
   }
 
@@ -26,6 +28,8 @@ class ElectionService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
+      console.log("Election results fetched successfully");
+      console.log(data);
       return data;
     } catch (error) {
       console.error('Error fetching election results:', error);
@@ -38,16 +42,42 @@ class ElectionService {
   async compareChoices(choice1, choice2) {
     try {
       console.log(`Comparing ${choice1} vs ${choice2} with combined analysis...`);
+      
+      // Check if client is initialized
+      if (!this.client) {
+        throw new Error('Gradio client not initialized');
+      }
+      
       const response = await this.client.predict("/predict", { 		
         choices: JSON.stringify([choice1, choice2]), 
-    });
-      if (!response.ok) { 
-        throw new Error(`Combined analysis HTTP error! status: ${response.status}`);
+      });
+      
+      // Gradio client responses don't have .ok property, check for data instead
+      if (!response || !response.data) {
+        throw new Error(`Combined analysis failed: No data received from Gradio client`);
       }
-      const combinedResults = response.data;
+      
+      let combinedResults = response.data;
+      
+      // Handle case where Gradio returns data as an array
+      if (Array.isArray(combinedResults) && combinedResults.length > 0) {
+        combinedResults = combinedResults[0];
+      }
+      
+      console.log('Processed Gradio response:', combinedResults);
       return combinedResults;
     } catch (error) {
       console.error('Error in combined analysis:', error);
+      
+      // Provide specific error messages based on error type
+      if (!this.client) {
+        console.warn('Falling back to mock data: Gradio client not initialized');
+      } else if (error.message.includes('No data received')) {
+        console.warn('Falling back to mock data: Gradio API returned empty response');
+      } else {
+        console.warn('Falling back to mock data: Unexpected error in Gradio client');
+      }
+      
       // Return mock comparison data for development
       return {
         state_colors: this.getMockComparisonData(choice1, choice2),

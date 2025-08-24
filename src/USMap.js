@@ -54,23 +54,25 @@ const USMap = ({ choice1, choice2, onComparisonComplete, isLoading: parentIsLoad
 
   // Get color for a state, default to light gray if not set
   const getStateColor = useCallback((stateId) => {
-    return stateColors[stateId] || '#e0e0e0';
+    return (stateColors && stateColors[stateId]) || '#e0e0e0';
   }, [stateColors]);
 
   const updateScoreboard = (colors) => {
     let redTotal = 0;
     let blueTotal = 0;
 
-    Object.entries(colors).forEach(([stateId, color]) => {
-      const electoralVotes = ElectoralCollege.get(stateId);
-      if (electoralVotes) {
-        if (color === '#F44336') { // Red
-          redTotal += electoralVotes;
-        } else if (color === '#2196F3') { // Blue
-          blueTotal += electoralVotes;
+    if (colors && typeof colors === 'object') {
+      Object.entries(colors).forEach(([stateId, color]) => {
+        const electoralVotes = ElectoralCollege.get(stateId);
+        if (electoralVotes) {
+          if (color === '#F44336') { // Red
+            redTotal += electoralVotes;
+          } else if (color === '#2196F3') { // Blue
+            blueTotal += electoralVotes;
+          }
         }
-      }
-    });
+      });
+    }
 
     setScoreboard([redTotal, blueTotal]);
   };
@@ -78,15 +80,12 @@ const USMap = ({ choice1, choice2, onComparisonComplete, isLoading: parentIsLoad
   // Apply fills whenever colors change
   useEffect(() => {
     if (!svgRef.current) return;
-    console.log("Applying colors to SVG paths");
     const paths = svgRef.current.querySelectorAll("path[id]");
     paths.forEach((p) => {
       const id = p.id.toUpperCase();
-      console.log(`Setting color for ${id}: ${getStateColor(id)}`);
-      if (stateColors[id]) {
+      if (stateColors && stateColors[id]) {
         p.setAttribute("style", `fill: ${stateColors[id]}; stroke: black; stroke-width: 1.5px`);
       } else {
-        console.log(`No color set for ${id}, defaulting to light gray`);
         p.setAttribute("style", "fill: rgb(249,249,249); stroke: black; stroke-width: 1.5px");
       }
     });
