@@ -1,5 +1,6 @@
 {
   "name": "frontend",
+  "homepage": "https://akann0.github.io/election-of-our-lifetime-frontend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

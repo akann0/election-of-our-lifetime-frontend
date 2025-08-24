@@ -7,7 +7,15 @@ class ElectionService {
     // Use relative API base in production (served by Flask), localhost in dev
     // this.baseUrl = (process.env.NODE_ENV === 'production') ? '' : 'http://localhost:8000';
     // this.inference = new HfInference(process.env.HF_TOKEN);
-    this.client = new Client.connect("akann0/basic-word-vectorization");
+    this.initializeGradioClient();
+  }
+
+  async initializeGradioClient() {
+    try {
+      this.client = new Client.connect("akann0/basic-word-vectorization");
+    } catch (error) {
+      console.error('Error initializing Gradio client:', error);
+    }
   }
 
   // Fetch election results from backend
