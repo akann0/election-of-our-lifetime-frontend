@@ -1,5 +1,5 @@
 // import { HfInference } from "@huggingface/inference";
-import { Client } from "@gradio/client";
+// Using direct Gradio API calls instead of client library
 
 // Service to handle election data and API calls
 class ElectionService {
@@ -7,16 +7,98 @@ class ElectionService {
     // Use relative API base in production (served by Flask), localhost in dev
     // this.baseUrl = (process.env.NODE_ENV === 'production') ? '' : 'http://localhost:8000';
     // this.inference = new HfInference(process.env.HF_TOKEN);
-    this.initializeGradioClient();
+    this.gradioBaseUrl = "https://akann0-basic-word-vectorization.hf.space/gradio_api/call/predict";
+    this.apiReady = true; // Direct API calls don't need initialization
+    console.log("Gradio direct API service ready");
   }
 
-  async initializeGradioClient() {
+  // Function to call Gradio Space API directly
+  async callGradioAPI(inputData) {
     try {
-      this.client = await Client.connect("akann0/basic-word-vectorization");
-      console.log("Gradio client initialized successfully");
+      // Step 1: Initiate the prediction
+      const initResponse = await fetch(this.gradioBaseUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          data: [inputData]
+        })
+      });
+
+      if (!initResponse.ok) {
+        throw new Error(`HTTP error! status: ${initResponse.status}`);
+      }
+
+      const initResult = await initResponse.json();
+      const eventId = initResult.event_id;
+      
+      if (!eventId) {
+        throw new Error("No event_id received from initial request");
+      }
+
+      // Step 2: Get the result using the event_id
+      const resultResponse = await fetch(`${this.gradioBaseUrl}/${eventId}`, {
+        method: "GET",
+        headers: {
+          "Accept": "text/event-stream",
+        }
+      });
+
+      if (!resultResponse.ok) {
+        throw new Error(`HTTP error! status: ${resultResponse.status}`);
+      }
+
+      // Step 3: Parse the streaming response
+      const reader = resultResponse.body.getReader();
+      const decoder = new TextDecoder();
+      
+      let result = '';
+      let done = false;
+
+      while (!done) {
+        const { value, done: streamDone } = await reader.read();
+        done = streamDone;
+        
+        if (value) {
+          const chunk = decoder.decode(value, { stream: true });
+          result += chunk;
+          
+          // Look for the final result in the stream
+          const lines = result.split('\n');
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(line.slice(6));
+                console.log('Stream parsing - found data:', data);
+                if (data && data.output) {
+                  return data.output;
+                }
+                // Also check if data is directly the array we want
+                if (Array.isArray(data) && data.length > 0) {
+                  console.log('Stream parsing - found array data:', data[0]);
+                  return data[0];
+                }
+              } catch (e) {
+                // Continue parsing other lines
+                console.log('Stream parsing - failed to parse line:', line.substring(0, 100));
+              }
+            }
+          }
+        }
+      }
+
+      // If streaming parsing fails, try to parse the entire result
+      try {
+        const finalResult = JSON.parse(result);
+        return finalResult;
+      } catch (e) {
+        return result; // Return raw result if JSON parsing fails
+      }
+
     } catch (error) {
-      console.error('Error initializing Gradio client:', error);
-      this.client = null; // Ensure client is null if initialization fails
+      console.error("Error calling Gradio API:", error);
+      throw error;
     }
   }
 
@@ -43,25 +125,47 @@ class ElectionService {
     try {
       console.log(`Comparing ${choice1} vs ${choice2} with combined analysis...`);
       
-      // Check if client is initialized
-      if (!this.client) {
-        throw new Error('Gradio client not initialized');
+      // Check if API is ready
+      if (!this.apiReady) {
+        throw new Error('Gradio API not ready');
       }
       
-      const response = await this.client.predict("/predict", { 		
-        choices: JSON.stringify([choice1, choice2]), 
-      });
+      // Use the direct API approach
+      const inputData = JSON.stringify([choice1, choice2]);
+      const result = await this.callGradioAPI(inputData);
       
-      // Gradio client responses don't have .ok property, check for data instead
-      if (!response || !response.data) {
-        throw new Error(`Combined analysis failed: No data received from Gradio client`);
+      if (!result) {
+        throw new Error(`Combined analysis failed: No data received from Gradio API`);
       }
       
-      let combinedResults = response.data;
+      let combinedResults = result;
       
       // Handle case where Gradio returns data as an array
       if (Array.isArray(combinedResults) && combinedResults.length > 0) {
         combinedResults = combinedResults[0];
+      }
+      
+      console.log('Raw Gradio response type:', typeof combinedResults);
+      console.log('Raw Gradio response:', combinedResults);
+      
+      // If we got a string, try to parse it as the event stream format
+      if (typeof combinedResults === 'string') {
+        console.log('Response is string, attempting to parse event stream...');
+        const lines = combinedResults.split('\n');
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(6));
+              console.log('Parsed event data:', data);
+              if (Array.isArray(data) && data.length > 0) {
+                console.log('Found array data, using first element:', data[0]);
+                return data[0];
+              }
+            } catch (e) {
+              console.log('Failed to parse line as JSON:', line);
+            }
+          }
+        }
       }
       
       console.log('Processed Gradio response:', combinedResults);
@@ -70,12 +174,12 @@ class ElectionService {
       console.error('Error in combined analysis:', error);
       
       // Provide specific error messages based on error type
-      if (!this.client) {
-        console.warn('Falling back to mock data: Gradio client not initialized');
+      if (!this.apiReady) {
+        console.warn('Falling back to mock data: Gradio API not ready');
       } else if (error.message.includes('No data received')) {
         console.warn('Falling back to mock data: Gradio API returned empty response');
       } else {
-        console.warn('Falling back to mock data: Unexpected error in Gradio client');
+        console.warn('Falling back to mock data: Unexpected error in Gradio API');
       }
       
       // Return mock comparison data for development
