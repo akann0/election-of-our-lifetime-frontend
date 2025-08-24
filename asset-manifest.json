@@ -1,0 +1,18 @@
+{
+  "files": {
+    "main.css": "/election-of-our-lifetime-frontend/static/css/main.a18466c8.css",
+    "main.js": "/election-of-our-lifetime-frontend/static/js/main.c011ba37.js",
+    "static/js/8.a2d46fd9.chunk.js": "/election-of-our-lifetime-frontend/static/js/8.a2d46fd9.chunk.js",
+    "static/js/453.670e15c7.chunk.js": "/election-of-our-lifetime-frontend/static/js/453.670e15c7.chunk.js",
+    "static/media/us-map.svg": "/election-of-our-lifetime-frontend/static/media/us-map.e71292536414cb349f272ba979bdeca3.svg",
+    "index.html": "/election-of-our-lifetime-frontend/index.html",
+    "main.a18466c8.css.map": "/election-of-our-lifetime-frontend/static/css/main.a18466c8.css.map",
+    "main.c011ba37.js.map": "/election-of-our-lifetime-frontend/static/js/main.c011ba37.js.map",
+    "8.a2d46fd9.chunk.js.map": "/election-of-our-lifetime-frontend/static/js/8.a2d46fd9.chunk.js.map",
+    "453.670e15c7.chunk.js.map": "/election-of-our-lifetime-frontend/static/js/453.670e15c7.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.a18466c8.css",
+    "static/js/main.c011ba37.js"
+  ]
+}
