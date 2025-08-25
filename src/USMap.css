@@ -7,6 +7,9 @@
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .us-map-header {
@@ -254,12 +257,22 @@
 
 .us-map-svg {
   width: 100%;
-  max-width: 1000px;
+  max-width: 800px; /* Reduced from 1000px */
   height: auto;
   background-color: white;
   border: 2px solid #ddd;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: block;
+  margin: 0 auto;
+  overflow: visible; /* Ensure entire SVG is visible */
+}
+
+/* Ensure the SVG itself scales properly */
+.us-map-svg svg {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 .state {
@@ -295,22 +308,56 @@
 
 /* Responsive design */
 @media (max-width: 768px) {
-  .us-map-container h1 {
-    font-size: 2rem;
-  }
-  
   .us-map-container {
-    padding: 10px;
+    padding: 15px;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .us-map-container h1 {
+    font-size: 1.8rem;
+  }
+
+  .us-map-header {
+    margin-bottom: 15px;
+  }
+
+  .us-map-header h1 {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+
+  .current-comparison {
+    padding: 12px;
+    margin-top: 8px;
+  }
+
+  .current-comparison h2 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+
+  .comparison-legend {
+    gap: 15px;
+  }
+
+  .legend-item {
+    font-size: 13px;
   }
 
   .us-map-scoreboard {
     padding: 15px;
+    margin-bottom: 20px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .scoreboard-header {
     flex-direction: column;
     gap: 15px;
-    align-items: flex-start;
+    align-items: center;
+    text-align: center;
   }
 
   .scoreboard-header h2 {
@@ -320,12 +367,13 @@
   .scoreboard-controls {
     flex-direction: column;
     gap: 15px;
-    align-items: flex-start;
+    align-items: center;
     width: 100%;
   }
 
   .scoreboard-totals {
-    gap: 15px;
+    gap: 20px;
+    justify-content: center;
   }
 
   .red-total, .blue-total {
@@ -349,5 +397,132 @@
 
   .bar-label {
     font-size: 0.8rem;
+  }
+
+  .us-map-svg {
+    width: 100%;
+    max-width: 600px; /* Smaller on mobile */
+    margin: 0 auto;
+    display: block;
+    border-radius: 8px;
+    overflow: visible; /* Allow scrolling if needed */
+  }
+
+  /* Ensure SVG scales properly on mobile */
+  .us-map-svg svg {
+    width: 100%;
+    height: auto;
+    max-height: 350px; /* Reduced height */
+    min-height: 200px;
+  }
+
+  .analysis-breakdown {
+    width: 100%;
+    padding: 0;
+  }
+
+  .breakdown-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    text-align: center;
+  }
+
+  .breakdown-header h3 {
+    font-size: 1.2rem;
+  }
+
+  .demographic-bar-row {
+    margin-bottom: 12px;
+  }
+
+  .demographic-label {
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+  }
+
+  .further-breakdown {
+    padding: 12px !important;
+  }
+
+  .further-breakdown h4 {
+    font-size: 1.1rem;
+  }
+
+  .breakdown-section h5 {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .us-map-container {
+    padding: 8px;
+  }
+
+  .us-map-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .current-comparison h2 {
+    font-size: 1rem;
+  }
+
+  .comparison-legend {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .legend-item {
+    font-size: 12px;
+    justify-content: center;
+  }
+
+  .us-map-scoreboard {
+    padding: 10px;
+    margin-bottom: 15px;
+  }
+
+  .scoreboard-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .scoreboard-totals {
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .red-total, .blue-total {
+    font-size: 0.95rem;
+  }
+
+  .scoreboard-bar-container {
+    height: 40px;
+  }
+
+  .us-map-svg {
+    max-width: 500px; /* Even smaller on very small screens */
+    border-radius: 6px;
+    margin-bottom: 15px;
+    overflow-x: auto; /* Allow horizontal scrolling if needed */
+  }
+
+  /* Ensure SVG scales properly on very small screens */
+  .us-map-svg svg {
+    max-height: 280px;
+    min-height: 180px;
+  }
+
+  .demographic-label {
+    font-size: 0.85rem;
+  }
+
+  .breakdown-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .further-breakdown-toggle {
+    padding: 6px 12px !important;
+    font-size: 0.8rem !important;
   }
 }

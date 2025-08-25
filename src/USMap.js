@@ -290,7 +290,14 @@ const USMap = ({ choice1, choice2, onComparisonComplete, isLoading: parentIsLoad
       <div className="us-map-svg">
         <USMapSVG 
           ref={svgRef}
-          style={{ width: '100%', height: 'auto' }}
+          viewBox="0 0 1000 589"
+          preserveAspectRatio="xMidYMid meet"
+          style={{ 
+            width: '100%', 
+            height: 'auto',
+            maxWidth: '100%',
+            display: 'block'
+          }}
           onClick={(e) => {
             const stateId = e.target.id;
             if (stateId && stateId.length === 2) {

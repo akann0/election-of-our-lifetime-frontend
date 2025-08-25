@@ -3,6 +3,9 @@
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
+  box-sizing: border-box;
+  width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 .App-header {
@@ -38,17 +41,44 @@
     padding: 10px;
   }
   
+  .App-header {
+    margin-bottom: 20px;
+  }
+  
   .App-header h1 {
-    font-size: 2rem;
+    font-size: 1.8rem;
+    line-height: 1.2;
+    margin: 0 0 15px 0;
   }
   
   .App-header p {
-    font-size: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    padding: 0 10px;
+  }
+  
+  .App-main {
+    max-width: 100%;
+    gap: 15px;
   }
 }
 
 @media (max-width: 480px) {
+  .App {
+    padding: 8px;
+  }
+  
   .App-header h1 {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
+    margin: 0 0 12px 0;
+  }
+  
+  .App-header p {
+    font-size: 0.9rem;
+    padding: 0 5px;
+  }
+  
+  .App-main {
+    gap: 12px;
   }
 }
